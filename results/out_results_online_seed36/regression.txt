@@ -1,0 +1,19 @@
+Mô hình: lợi ích ~ accuracy trung bình
+  R² = 0.0014
+  hằng số                hệ số -0.4378  SE 2.4219  t -0.18  p 0.857
+  accuracy trung bình    hệ số +0.0292  SE 0.0274  t +1.06  p 0.287
+
+Mô hình: lợi ích ~ độ bất đồng
+  R² = 0.0878
+  hằng số                hệ số +0.3342  SE 0.2057  t +1.62  p 0.105
+  độ bất đồng            hệ số +13.4494  SE 1.5195  t +8.85  p 5.34e-18
+
+Mô hình: lợi ích ~ accuracy trung bình + độ bất đồng
+  R² = 0.2814
+  hằng số                hệ số -52.5322  SE 3.5766  t -14.69  p 1.72e-43
+  accuracy trung bình    hệ số +0.5603  SE 0.0379  t +14.80  p 4.6e-44
+  độ bất đồng            hệ số +39.0266  SE 2.1926  t +17.80  p 4.24e-60
+
+Tương quan hạng Spearman với lợi ích so với thành viên tốt nhất:
+  accuracy trung bình  rho -0.070  p 0.0458
+  độ bất đồng          rho +0.300  p 1.84e-18

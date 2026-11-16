@@ -1,0 +1,43 @@
+# khoa va token — khong bao gio commit
+kaggle.json
+access_token
+.kaggle/
+*.pem
+*.key
+.env
+
+# model nang, khong day len
+*.keras
+*.h5
+*.ckpt
+*.pt
+
+# anh goc cua dataset
+*.jpg
+*.jpeg
+*.png
+!figures/*.png
+
+# san pham build cua LaTeX
+*.aux
+*.log
+*.out
+*.bbl
+*.blg
+*.synctex.gz
+*.fdb_latexmk
+*.fls
+*.toc
+
+# rac cua he dieu hanh / editor
+.DS_Store
+Thumbs.db
+desktop.ini
+.ipynb_checkpoints/
+__pycache__/
+*.pyc
+.vscode/
+.idea/
+
+# ban ghi nguon goc tung notebook: huu ich khi lam viec, nguoi doc khong can
+results_by_notebook/

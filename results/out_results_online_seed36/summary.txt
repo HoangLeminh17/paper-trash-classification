@@ -1,0 +1,43 @@
+Model đơn tốt nhất: efficient_net_DUAL_POOLING_FC — 90.71%
+Ensemble tốt nhất:  dense_net_DUAL_POOLING_FC + efficient_net_DUAL_POOLING_FC + xception_DUAL_POOLING_FC — 93.38%
+Chênh lệch: +2.67 điểm, KTC 95% [+1.94, +3.43]
+
+Số cặp không phân biệt được bằng McNemar (p > 0,05): 57/153
+  Dù vậy các cặp đó vẫn đoán khác nhau trên trung bình 437 ảnh (245–627).
+  Accuracy ngang nhau không có nghĩa là sai giống nhau.
+
+Theo số backbone khác nhau trong bộ ba:
+                      so_to_hop  acc_tb  acc_max  loi_ich_tb  bat_dong_tb
+n_distinct_backbones                                                     
+1                             6  89.691   91.244       0.765        0.092
+2                           270  91.139   92.765       1.610        0.124
+3                           540  92.065   93.384       2.421        0.140
+
+Các cách chọn thành viên:
+                                  strategy                                                                                   models  ens_acc  best_member_acc  gain_over_best  mean_disagree_pred
+                       Top-3 theo accuracy efficient_net_DUAL_POOLING_FC + dense_net_DUAL_POOLING_FC + efficient_net_GAP_BN_FC_Drop   92.624           90.709           1.914               0.099
+             Top-3, mỗi backbone một model      efficient_net_DUAL_POOLING_FC + dense_net_DUAL_POOLING_FC + xception_GAP_BN_FC_Drop   93.328           90.709           2.618               0.116
+                         Bất đồng cao nhất               inception_v3_SIMPLE_FC + mobilenet_v3_SIMPLE_FC + xception_DUAL_POOLING_FC   91.864           88.964           2.900               0.176
+Bất đồng cao nhất trong nhóm khá (±2 điểm)            efficient_net_SIMPLE_FC + resnet_50_GAP_BN_FC_Drop + xception_DUAL_POOLING_FC   92.708           88.992           3.716               0.132
+               Tổ hợp tốt nhất (trần trên)     dense_net_DUAL_POOLING_FC + efficient_net_DUAL_POOLING_FC + xception_DUAL_POOLING_FC   93.384           90.709           2.675               0.123
+            Ngẫu nhiên (trung bình 200 bộ)                                                                                        -   91.701           89.662           2.039               0.132
+
+Mô hình: lợi ích ~ accuracy trung bình
+  R² = 0.0014
+  hằng số                hệ số -0.4378  SE 2.4219  t -0.18  p 0.857
+  accuracy trung bình    hệ số +0.0292  SE 0.0274  t +1.06  p 0.287
+
+Mô hình: lợi ích ~ độ bất đồng
+  R² = 0.0878
+  hằng số                hệ số +0.3342  SE 0.2057  t +1.62  p 0.105
+  độ bất đồng            hệ số +13.4494  SE 1.5195  t +8.85  p 5.34e-18
+
+Mô hình: lợi ích ~ accuracy trung bình + độ bất đồng
+  R² = 0.2814
+  hằng số                hệ số -52.5322  SE 3.5766  t -14.69  p 1.72e-43
+  accuracy trung bình    hệ số +0.5603  SE 0.0379  t +14.80  p 4.6e-44
+  độ bất đồng            hệ số +39.0266  SE 2.1926  t +17.80  p 4.24e-60
+
+Tương quan hạng Spearman với lợi ích so với thành viên tốt nhất:
+  accuracy trung bình  rho -0.070  p 0.0458
+  độ bất đồng          rho +0.300  p 1.84e-18
