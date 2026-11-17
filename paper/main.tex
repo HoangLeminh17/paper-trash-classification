@@ -203,7 +203,9 @@ in total. We report both seeds throughout and treat a result as real only if it
 holds under each. Two seeds bound the run-to-run variation but do not estimate
 it precisely; we return to this in Section~\ref{sec:limits}. A third seed (123)
 checks Section~\ref{sec:select}; 8 of its models (ResNet50, DenseNet201, two
-Xception) were trained on a Tesla T4 after the P100 was retired.
+Xception) were trained on a Tesla T4 after the P100 was retired. An LLM-based
+assistant was used to help write the analysis scripts and to edit the English;
+the authors designed the experiments and checked all results.
 
 \section{The Head Is the Stable Axis}
 
@@ -570,8 +572,8 @@ conclusion that would not have replicated.
 
 % TODO TRUOC KHI NOP: tao repo va thay URL that vao day.
 \paragraph{Reproducibility.}
-All 36 models were trained in public Kaggle notebooks, which record the
-environment, the random seeds and the full training logs. We release the
+All models were trained in Kaggle notebooks, which record the environment,
+the random seeds and the full training logs. We release the
 per-image predictions of every model on both the validation and the test
 split --- the validation predictions are what make the selection protocol of
 Section~\ref{sec:select} checkable --- together with the
