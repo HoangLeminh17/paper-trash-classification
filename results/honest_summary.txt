@@ -56,3 +56,32 @@ Model đơn tốt nhất theo VAL: efficient_net_DUAL_POOLING_FC (val 90.69%, te
      4         93.27         92.79    92.16
      5         93.47         93.64    92.50
      6         93.38         93.19    92.67
+
+==========================================================================
+seed123   n_val=3511  n_test=3552
+==========================================================================
+Tương quan accuracy VAL vs TEST trên 18 model: r=0.986 (p=6.6e-14)
+
+Dự báo LỢI ÍCH TRÊN TEST bằng các biến đo TRÊN VAL (816 tổ hợp):
+  accuracy TB (val)    R2=0.039   hệ số +0.146 (p=1.4e-08)
+  bất đồng (val)       R2=0.041   hệ số +9.930 (p=4.9e-09)
+  cả hai               R2=0.366   hệ số +0.678 (p=5.3e-75), +44.806 (p=1.9e-75)
+  Spearman bất đồng(val) vs lợi ích(test): rho=+0.199, p=1e-08
+
+Model đơn tốt nhất theo VAL: efficient_net_DUAL_POOLING_FC (val 90.91%, test 90.48%)
+
+  quy tắc (chỉ nhìn val)               test   gain  thành viên
+  Top-3 by val accuracy               92.12  +1.63  dense_net, efficient_net, efficient_net
+  One per backbone, val accuracy      92.91  +2.42  dense_net, efficient_net, xception
+  Most val-diverse overall            91.19  +0.70  inception_v3, mobilenet_v3, resnet_50
+  Most val-diverse within 2 pts       92.62  +2.14  inception_v3, resnet_50, xception
+  Random triple (mean of 200)         91.68  +1.20
+  Oracle on test (not usable)         93.30  +2.82
+
+  Cỡ ensemble (chọn bằng val, chấm trên test):
+     k  per-backbone  diverse<=2pt   random
+     2         92.37         91.53    90.78
+     3         92.91         92.62    91.78
+     4         93.38         92.93    92.30
+     5         93.05         93.58    92.57
+     6         93.24         93.41    92.70

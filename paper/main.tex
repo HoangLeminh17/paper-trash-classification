@@ -201,7 +201,9 @@ Tesla P100 with batch size 32.
 Every configuration was trained twice, under seeds 36 and 42, giving 36 models
 in total. We report both seeds throughout and treat a result as real only if it
 holds under each. Two seeds bound the run-to-run variation but do not estimate
-it precisely; we return to this in Section~\ref{sec:limits}.
+it precisely; we return to this in Section~\ref{sec:limits}. A third seed (123)
+checks Section~\ref{sec:select}; 8 of its models (ResNet50, DenseNet201, two
+Xception) were trained on a Tesla T4 after the P100 was retired.
 
 \section{The Head Is the Stable Axis}
 
@@ -452,9 +454,13 @@ The problem is the sharpness of the rule. Picking the single
 disagreement-maximising triple out of 816 candidates is a high-variance
 decision, and the disagreement estimate carries enough noise from a 3{,}511-image
 validation split that the argmax often lands on a triple whose diversity was
-overstated. A statistically real signal does not automatically give a reliable
-selection rule, and reporting the rule without the honest protocol would have
-overstated what a practitioner can expect by roughly two points.
+overstated. We measured this directly by resampling the validation split 500
+times with replacement and rerunning every rule on each resample, with the test
+split held fixed. The diversity rule picks 68 different triples under seed 36
+and 56 under seed 42, and its most frequent choice appears in only 14\% and
+36\% of resamples. A statistically real signal does not automatically give a
+reliable selection rule, and reporting the rule without the honest protocol
+would have overstated what a practitioner can expect by roughly two points.
 
 \paragraph{What does survive is structural.}
 Taking the most accurate model from each of three different backbones needs no
@@ -462,11 +468,29 @@ diversity estimate at all, only the identity of the architectures. It reaches
 93.19\% under seed 42, beating the three-most-accurate rule by 0.74 points, and
 92.57\% under seed 36, losing to it by 0.05. It beats a random triple by 0.77
 and 1.50 points. Because it reads nothing off the validation predictions beyond
-a per-model accuracy ranking, there is very little for it to overfit.
+a per-model accuracy ranking, there is very little for it to overfit. The
+single split understates this. Averaged over the 500 validation resamples, it
+is the best rule under both seeds (92.77\% and 92.99\%), ahead of the three most
+accurate models (92.40\%, 92.63\%) and the diversity rule (92.38\%, 92.52\%),
+with a standard deviation of 0.33 and 0.20 points. The held-out seed 123
+agrees: 92.91\% against 92.12\% for the top three (92.89\% over resamples).
+
+\paragraph{Learned weights do not change the picture.}
+Soft voting with equal weights is the simplest combiner, so we also fitted
+member weights on validation by minimising negative log-likelihood and scored
+the weighted vote on test. For the four rules at $k=3$ the change is between
+$-0.62$ and $+0.34$ points, and for one model per backbone at $k \ge 4$
+weighting is slightly worse under both seeds. The more informative case
+is weighting all 18 models at once. It matches the equal vote (93.36\% against
+93.41\%, and 93.44\% against 93.27\%), concentrates on an effective 4.4 and 4.8
+members, and under both seeds puts its five largest weights on the
+DUAL\_POOLING\_FC model of five different backbones. Left to itself, the
+combiner rediscovers the two findings of this paper: the strong head, once per
+architecture.
 
 \paragraph{The rule holds at every ensemble size.}
 Our choice of three members was a convenience, so we repeated the comparison
-for $k = 2,\dots,6$ under the same validation-only protocol
+for $k = 2,\dots,6$ under the same validation-only protocol.
 The point of the sweep is robustness rather than tuning: taking one model per
 backbone beats a random selection of the same size at all five sizes under both
 seeds, ten comparisons out of ten, by between 0.6 and 1.5 points. The advantage
@@ -475,17 +499,12 @@ to pick.
 
 Whether more than three members is worth the inference cost is less clear.
 Moving from $k=3$ to $k=4$ gains 0.79 points under seed 36 but only 0.08 under
-seed 42, and the curves are flat from $k=4$ onwards. That asymmetry is worth
-unpacking, because it is not about ensemble size at all. Under seed 36 the
-third- and fourth-ranked backbones are separated by 0.09 points of validation
-accuracy, and the one that wins that near-tie, ResNet50, is the weaker partner:
-substituting Xception for it at $k=3$ raises test accuracy from 92.57\% to
-93.33\%. Under seed 42 the same two backbones are 0.43 points apart, Xception
-wins, and $k=3$ is already strong. The jump at $k=4$ is the cost of a coin-flip
-between two near-tied candidates, recovered one step later by admitting the
-backbone that should have been third --- the same high-variance selection
-problem that defeats the diversity-maximising rules, in a different place. We
-therefore draw no recommendation about ensemble size.
+seed 42, and the curves are flat from $k=4$ onwards. The asymmetry is not about
+size. Under seed 36 the third- and fourth-ranked backbones are 0.09 validation
+points apart, and the near-tie goes to ResNet50, the weaker partner;
+substituting Xception at $k=3$ gives 93.33\% instead of 92.57\%. The jump at
+$k=4$ is the cost of that coin-flip, so we draw no recommendation about
+ensemble size.
 
 \section{Limitations}
 \label{sec:limits}
@@ -502,19 +521,20 @@ shown that the numbers transfer, and the magnitude of the diversity effect
 plausibly depends on how fine-grained the label set is. A replication on a
 second long-tailed, fine-grained benchmark is the obvious next step.
 
-We use unweighted soft voting throughout. Learned combination weights would
-likely raise the absolute numbers, and could plausibly change which selection
-rule wins, since weighting partly compensates for a badly chosen member. We
-sweep the ensemble size from two to six but do not go further, because six
-backbones is the pool we trained.
+Hardware matters as much as the seed: retraining one seed-123 model on the T4
+instead of the P100 changed 237 of 3{,}552 test predictions, against 217--306
+for a change of seed.
 
-Our validation split has 3{,}511 images, and Section~\ref{sec:select} shows that
-the noise in a diversity estimate from a split of that size is enough to blunt
-an argmax-style selection rule. With a larger validation split, or diversity
-estimated by cross-validation on the training set, the diversity-maximising
-rules might recover some of the advantage they show when diversity is measured
-on test. We did not test this, and we would rather report the rule that worked
-under the protocol we can defend.
+All six backbones are convolutional; vision transformers err differently, so
+our pool may understate how much spanning architecture families is worth.
+
+Our validation split has 3{,}511 images, and the resampling in
+Section~\ref{sec:select} shows that this is too few for an argmax over 816
+triples to settle on one answer. Diversity estimated by cross-validation on the
+training set might let the diversity-maximising rules recover some of the
+advantage they show when diversity is measured on test. We did not test this,
+and we would rather report the rule that worked under the protocol we can
+defend.
 
 \section{Conclusion}
 

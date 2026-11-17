@@ -19,7 +19,7 @@ import pandas as pd
 from scipy import stats
 
 HERE = Path(__file__).parent
-FIGDIR = HERE.parent / "Paper-IDA2027" / "figures"
+from paths import FIGDIR, OUT, test_dir, val_dir
 FIGDIR.mkdir(parents=True, exist_ok=True)
 
 SEEDS = ["seed36", "seed42"]
@@ -79,16 +79,16 @@ def _load_dir(folder):
 
 
 def load(seed):
-    return _load_dir(HERE / f"results_online_{seed}")
+    return _load_dir(test_dir(seed))
 
 
 def load_val(seed):
-    return _load_dir(HERE / f"results_val_{seed}")
+    return _load_dir(val_dir(seed))
 
 
 DATA = {s: load(s) for s in SEEDS}
 TRAIN = defaultdict(dict)
-with open(HERE / "train_acc.csv", encoding="utf-8") as f:
+with open(OUT / "train_acc.csv", encoding="utf-8") as f:
     for r in csv.DictReader(f):
         TRAIN[r["seed"]][r["model"]] = float(r["train_acc"])
 
@@ -224,7 +224,7 @@ def fig_diversity():
 # --------------------------------------------------------------- hình 4
 def fig_size():
     """Cỡ ensemble: chọn bằng val, chấm trên test."""
-    df = pd.read_csv(HERE / "honest_sizes.csv")
+    df = pd.read_csv(OUT / "honest_sizes.csv")
     fig, axes = plt.subplots(1, 2, figsize=(5.0, 2.2), sharey=True)
     for ax, seed in zip(axes, SEEDS):
         s = df[df.seed == seed].sort_values("k")

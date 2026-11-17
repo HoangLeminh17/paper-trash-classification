@@ -12,13 +12,13 @@ stored predictions in a few minutes on a CPU.
 
 ```
 analysis/        scripts that produce every number in the paper
-predictions/     per-image predictions, 18 configurations x 2 seeds x 2 splits
+predictions/     per-image predictions, 18 configurations x 3 seeds x 2 splits
 results/         the outputs those scripts produce
 figures/         the figures as they appear in the paper
 paper/           LaTeX source
 ```
 
-`predictions/` holds 72 `.npz` files. Each contains `y_pred` (N,), `y_prob`
+`predictions/` holds 108 `.npz` files. Each contains `y_pred` (N,), `y_prob`
 (N, 36) and `y_true` (N,) for one configuration, in a fixed image order shared
 by every file. The test split has 3,552 images and the validation split 3,511.
 
@@ -33,7 +33,13 @@ pip install numpy pandas scipy scikit-learn matplotlib
 cd analysis
 
 # main analysis: members selected on validation, scored on test
-python analysis_03_honest.py --seeds seed36 seed42
+python analysis_03_honest.py --seeds seed36 seed42 seed123
+
+# learned (NLL-fitted) member weights vs. equal weights
+python analysis_04_weighted.py --seeds seed36 seed42 seed123
+
+# stability of each selection rule over 500 validation resamples
+python analysis_05_bootstrap.py --seeds seed36 seed42 seed123
 
 # tables
 python paper_tables.py
@@ -66,7 +72,16 @@ Three Kaggle notebooks, chained only because a single run exceeds Kaggle's
 configurations each one skips, and all three used the same container image and
 the same dataset, so the two seeds differ only in the seed.
 
-Training used TensorFlow 2.19 on one NVIDIA Tesla P100: three warm-up epochs
+Seed 123 is a held-out check on the ensemble-selection results and is not used
+for the per-configuration tables or figures. Ten of its configurations come from
+the same P100 runs. The other eight (all ResNet50 and DenseNet201 models, and
+Xception with `GAP_BN_FC_Drop` and `DUAL_POOLING_FC`) were trained in November
+2026 on an NVIDIA Tesla T4, because the P100 was no longer offered, with the
+same code, data and seed. Retraining `xception_SIMPLE_FC` on the T4 as a control
+changed 237 of 3,552 test predictions, comparable to a change of seed (217-306);
+the released file for that configuration is the P100 one.
+
+Training used TensorFlow 2.19 on one NVIDIA Tesla P100 (seeds 36 and 42): three warm-up epochs
 with the backbone frozen at lr 1e-3, then up to 30 fine-tuning epochs at lr
 1e-5, with focal loss (gamma 3.0), balanced class weights, `ReduceLROnPlateau`
 (factor 0.3, patience 3) and early stopping on validation accuracy (patience 5).

@@ -10,6 +10,7 @@ import pandas as pd
 from scipy import stats
 
 HERE = Path(__file__).parent
+from paths import OUT, test_dir, val_dir
 SEEDS = ["seed36", "seed42"]
 BACKBONES = ["efficient_net", "dense_net", "xception", "resnet_50",
              "inception_v3", "mobilenet_v3"]
@@ -18,7 +19,7 @@ HEADS = ["SIMPLE_FC", "GAP_BN_FC_Drop", "DUAL_POOLING_FC"]
 
 def load(seed):
     out = {}
-    for p in (HERE / f"results_online_{seed}").glob("preds_*.npz"):
+    for p in (test_dir(seed)).glob("preds_*.npz"):
         d = np.load(p)
         out[p.stem.replace("preds_", "")] = (
             d["y_pred"].astype(int), d["y_prob"].astype(np.float64),
@@ -30,7 +31,7 @@ def load(seed):
 def main():
     data = {s: load(s) for s in SEEDS}
     train = defaultdict(dict)
-    with open(HERE / "train_acc.csv", encoding="utf-8") as f:
+    with open(OUT / "train_acc.csv", encoding="utf-8") as f:
         for r in csv.DictReader(f):
             train[r["seed"]][r["model"]] = float(r["train_acc"])
 

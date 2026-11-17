@@ -23,6 +23,7 @@ import pandas as pd
 from scipy import stats
 
 HERE = Path(__file__).parent
+from paths import OUT, test_dir, val_dir
 HEADS = ["SIMPLE_FC", "GAP_BN_FC_Drop", "DUAL_POOLING_FC"]
 RNG = np.random.default_rng(36)
 
@@ -49,8 +50,8 @@ def soft_vote(d, combo):
 
 
 def run_seed(seed, out_lines):
-    val = load(HERE / f"results_val_{seed}")
-    test = load(HERE / f"results_online_{seed}")
+    val = load(val_dir(seed))
+    test = load(test_dir(seed))
     models = sorted(set(val) & set(test))
     assert len(models) == 18, f"{seed}: chỉ có {len(models)} model chung"
 
@@ -209,14 +210,14 @@ def main():
     lines, sels, sizes = [], [], []
     for s in a.seeds:
         T, sel, size, _ = run_seed(s, lines)
-        T.to_csv(HERE / f"honest_triples_{s}.csv", index=False)
+        T.to_csv(OUT / f"honest_triples_{s}.csv", index=False)
         sels.append(sel); sizes.append(size)
 
-    pd.concat(sels).to_csv(HERE / "honest_selection.csv", index=False)
-    pd.concat(sizes).to_csv(HERE / "honest_sizes.csv", index=False)
+    pd.concat(sels).to_csv(OUT / "honest_selection.csv", index=False)
+    pd.concat(sizes).to_csv(OUT / "honest_sizes.csv", index=False)
 
     text = "\n".join(lines)
-    (HERE / "honest_summary.txt").write_text(text, encoding="utf-8")
+    (OUT / "honest_summary.txt").write_text(text, encoding="utf-8")
     print(text)
 
 
