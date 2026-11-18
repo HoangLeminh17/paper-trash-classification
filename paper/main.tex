@@ -32,7 +32,7 @@ Diversity in Fine-Grained Waste Classification}
 \author{Minh Hoang Le \and Vanha Tran}
 \authorrunning{M. H. Le and V. Tran}
 \institute{Faculty of Artificial Intelligence, FPT University, Hanoi 155514, Vietnam\\
-\email{hatv14@fe.edu.vn}}
+\email{phamhaihau1976@gmail.com, hatv14@fe.edu.vn}}
 
 \maketitle
 
@@ -44,20 +44,21 @@ ImageNet-pretrained backbones and three classifier heads on a 36-class waste
 image dataset, repeat every combination under two random seeds, and then look
 at per-image predictions rather than at summary scores. Three things follow.
 First, the choice of head behaves far more consistently than the choice of
-backbone: a global-average-pooling head with batch normalisation and dropout
-beats a plain linear head on all six backbones under both seeds, and the
-train--test gap grows monotonically with head capacity, from 3.6 points to 7.3
-points on average. Second, of the 153 model pairs, 57 cannot be separated by
-McNemar's test, yet those same pairs disagree on 437 test images on average.
+backbone: adding one hidden layer to the head beats a linear head on all six
+backbones under both seeds, and the
+train--test gap grows monotonically with head capacity, from 3.6 points to over
+7 points on average. Second, of the 153 model pairs, 57 (seed 36) and 41 (seed
+42) cannot be separated by McNemar's test, yet they disagree on about 437 test
+images on average.
 Equal accuracy does not mean equal errors. Third, we exploit that: across all
 816 three-model soft-voting ensembles, the mean accuracy of the members
-explains almost none of the gain over the best member ($R^2 = 0.001$), while
-adding their mean pairwise disagreement raises $R^2$ to 0.29, with a large and
+explains almost none of the gain over the best member ($R^2 \le 0.05$), while
+adding their mean pairwise disagreement raises $R^2$ to 0.29--0.37, with a large and
 highly significant diversity coefficient. Both predictors are measured on a
 held-out validation split and the gain on test, so no test information enters
 the selection. The practical consequence is narrower than the statistical one.
 Rules that maximise diversity directly do not survive this honest protocol:
-their apparent advantage shrinks by about two points once diversity is
+their apparent advantage shrinks by 1.2 to 2.0 points once diversity is
 estimated off the test set. What does survive is the cheap structural proxy: taking one model per backbone
 beats a random selection of the same size at every ensemble size from two to
 six, under both seeds.
@@ -298,7 +299,7 @@ Under seed 36, 57 of the 153 pairs cannot be separated at $p > 0.05$; under seed
 \caption{Every model pair, plotted by McNemar $p$-value against the number of
 test images on which the two models predict different labels. Pairs to the
 right of the dashed line are statistically indistinguishable, yet none of them
-agrees on fewer than 245 images. The two axes are close to independent:
+disagrees on fewer than 245 images. The two axes are close to independent:
 knowing that a significance test cannot separate two models says almost nothing
 about how similarly they behave.}
 \label{fig:mcnemar}
@@ -336,13 +337,13 @@ reverse a conclusion. Validation and test accuracy are strongly but not
 perfectly related across the 18 models ($r = 0.970$ for seed 36, $r = 0.986$
 for seed 42), so the substitution is not free.
 
-Ensembling helps almost always, but not uniformly. Under seed 36, 730 of the
-816 triples (89\%) beat their best member, and 738 of 816 under seed 42. The
+Ensembling helps almost always, but not uniformly. Under seed 36, 809 of the
+816 triples (99\%) beat their best member, and 801 of 816 under seed 42. The
 best triple reaches 93.38\% and 93.36\%, against best single models of 90.71\%
-and 90.43\% (+2.67 and +2.82 points, paired bootstrap 95\% CIs $[+1.94, +3.43]$
-and $[+2.03, +3.66]$). But the spread between the best and the worst triple is
-6.6 points, far wider than the 1.9 points separating the best and worst single
-model in the upper half of Table~\ref{tab:main}. Which three models you pick
+and 90.54\% (+2.67 and +2.82 points, paired bootstrap 95\% CIs $[+1.94, +3.43]$
+and $[+2.03, +3.66]$). But under seed 36 the spread between the best and the
+worst triple is 6.6 points, far wider than the 1.9 points separating the nine most accurate
+single models. Which three models you pick
 matters more than which single model is best.
 
 \begin{figure}[tb]
@@ -392,8 +393,8 @@ neither single-predictor model is dependable.
 
 The joint model is. Under both seeds $R^2$ rises sharply --- to 0.29 and 0.37
 --- and the disagreement coefficient is large and highly significant
-($+43.3$ and $+42.0$). The jump happens because the two predictors are mildly
-negatively related: the most diverse triples tend to contain weaker members, so
+($+43.3$ and $+42.0$). The jump happens because the two predictors are strongly
+negatively related ($r = -0.76$ and $-0.82$): the most diverse triples tend to contain weaker members, so
 each variable masks part of the other's effect until both are present. A
 practitioner who ranks candidates by accuracy alone is looking at the predictor
 that, on its own, carries almost no information about how much ensembling will
@@ -402,7 +403,7 @@ help.
 \paragraph{Backbone diversity is a cheap proxy.}
 Counting distinct backbones carries most of the same signal without computing
 anything. Triples drawn from one backbone --- three heads on the same features
---- gain 0.77 and 0.57 points on average; spanning two backbones gains 1.61 and
+--- gain 0.76 and 0.57 points on average; spanning two backbones gains 1.61 and
 1.43, and spanning three gains 2.42 and 2.20. Architectural variety does the
 work that independent random seeds are usually asked to do, at no extra
 training cost.
@@ -447,8 +448,8 @@ routinely does --- the rule "take the most disagreeing triple among members
 within 2 points of the best" was the strongest usable rule by a clear margin,
 gaining 3.72 and 3.27 points. Re-estimating exactly the same rule on validation
 drops it to 1.69 and 2.08, at or below simply taking the three most accurate
-models. About half of its apparent advantage was the selection rule fitting the
-test set.
+models. Between a third and a half of its apparent advantage was the selection
+rule fitting the test set.
 
 The underlying statistical relationship is not the problem: Table~\ref{tab:reg}
 shows that validation-measured disagreement still predicts test gain strongly.
@@ -462,7 +463,7 @@ split held fixed. The diversity rule picks 68 different triples under seed 36
 and 56 under seed 42, and its most frequent choice appears in only 14\% and
 36\% of resamples. A statistically real signal does not automatically give a
 reliable selection rule, and reporting the rule without the honest protocol
-would have overstated what a practitioner can expect by roughly two points.
+would have overstated what a practitioner can expect by 1.2 to 2.0 points.
 
 \paragraph{What does survive is structural.}
 Taking the most accurate model from each of three different backbones needs no
@@ -546,19 +547,19 @@ than summary scores. The classifier head turned out to be the more dependable
 design axis: its effect held on every backbone under both seeds, while the
 backbone ranking changed between seeds. Head capacity bought training accuracy
 and not test accuracy, with the train--test gap rising monotonically from 3.6 to
-7.3 points.
+over 7 points.
 
-More than a third of all model pairs were statistically indistinguishable by
+Between a quarter and a third of all model pairs were indistinguishable by
 McNemar's test, and those pairs still disagreed on roughly 12\% of the test set.
 Across all 816 three-model ensembles, the mean accuracy of the members
-explained almost none of the gain over the best member, while their pairwise
-disagreement explained a great deal --- and this held with both predictors
+explained almost none of the gain over the best member, while adding their
+pairwise disagreement explained 29--37\% of it --- and this held with both predictors
 measured on validation rather than on test.
 
 The practical lesson is narrower than the statistical one, and the gap between
 them is itself a finding. Selecting the most diverse triple looked like the
-best rule available while diversity was estimated on the test set, and lost
-about half its advantage once that estimate moved to validation. What survived
+best rule available while diversity was estimated on the test set, and lost a
+third to a half of its advantage once that estimate moved to validation. What survived
 was the rule that needs no estimate at all: take the best model from each of
 several different backbones. That rule beat a random selection of the same size
 at every ensemble size we tried, under both seeds. Architectural variety buys
