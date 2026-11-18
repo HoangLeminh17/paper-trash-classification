@@ -92,5 +92,5 @@ split 80/10/10 into 28,201 / 3,511 / 3,552 images.
 
 ## Citation
 
-Le, M., Tran, V.: *Equal Accuracy, Different Mistakes: Classifier Heads and
+Le, M.H., Tran, V.: *Equal Accuracy, Different Mistakes: Classifier Heads and
 Error Diversity in Fine-Grained Waste Classification*. Under review.
